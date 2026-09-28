@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="balance_bot">
+
+  <!-- ==================== GLOBAL MATERIALS ==================== -->
+  <material name="chassis_blue">
+    <color rgba="0.0 0.45 0.85 1.0" />
+  </material>
+
+  <material name="wheel_dark">
+    <color rgba="0.1 0.1 0.1 1.0" />
+  </material>
+
+  <!-- ==================== BASE FOOTPRINT ==================== -->
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0.032" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ==================== MAIN CHASSIS ==================== -->
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0 0 0.08" rpy="0 0 0" />
+      <mass value="0.8" />
+      <inertia ixx="0.002" ixy="0.0" ixz="0.0" iyy="0.002" iyz="0.0" izz="0.001" />
+    </inertial>
+    <visual>
+      <origin xyz="-1.3192 -0.6987 -0.9024" rpy="0 0 1.5708" />
+      <geometry>
+        <mesh filename="package://self_balancing_robot/meshes/base_link.STL"/>
+      </geometry>
+      <material name="chassis_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.08" rpy="0 0 0" />
+      <geometry>
+        <box size="0.10 0.14 0.20" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ==================== LEFT WHEEL ==================== -->
+  <link name="left_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="0.1" />
+      <inertia ixx="0.00003" ixy="0.0" ixz="0.0" iyy="0.00003" iyz="0.0" izz="0.00005" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://self_balancing_robot/meshes/left_wheel_link.STL"/>
+      </geometry>
+      <material name="wheel_dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.032" length="0.02" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Original SolidWorks joint origin restored -->
+  <joint name="left_wheel_joint" type="continuous">
+    <origin xyz="0 0.092 0" rpy="-1.5708 0 0" />
+    <parent link="base_link" />
+    <child link="left_wheel_link" />
+    <axis xyz="0 0 1" />
+    <dynamics damping="0.01" friction="0.01"/>
+  </joint>
+
+  <!-- ==================== RIGHT WHEEL ==================== -->
+  <link name="right_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="0.1" />
+      <inertia ixx="0.00003" ixy="0.0" ixz="0.0" iyy="0.00003" iyz="0.0" izz="0.00005" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 3.14159 0" />
+      <geometry>
+        <mesh filename="package://self_balancing_robot/meshes/right_wheel_link.STL"/>
+      </geometry>
+      <material name="wheel_dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.032" length="0.02" />
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Original SolidWorks joint origin restored -->
+  <joint name="right_wheel_joint" type="continuous">
+    <origin xyz="0 -0.068 0" rpy="-1.5708 0 0" />
+    <parent link="base_link" />
+    <child link="right_wheel_link" />
+    <axis xyz="0 0 1" />
+    <dynamics damping="0.01" friction="0.01"/>
+  </joint>
+
+  <!-- ==================== IMU LINK ==================== -->
+  <link name="imu_link"/>
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0 0 0.08" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ==================== GAZEBO MATERIAL & FRICTION ==================== -->
+  <gazebo reference="base_link">
+    <material>
+      <ambient>0.0 0.45 0.85 1.0</ambient>
+      <diffuse>0.0 0.45 0.85 1.0</diffuse>
+      <specular>0.4 0.4 0.4 1.0</specular>
+    </material>
+  </gazebo>
+
+  <gazebo reference="left_wheel_link">
+    <mu1>2.0</mu1>
+    <mu2>2.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <material>
+      <ambient>0.1 0.1 0.1 1.0</ambient>
+      <diffuse>0.1 0.1 0.1 1.0</diffuse>
+      <specular>0.2 0.2 0.2 1.0</specular>
+    </material>
+  </gazebo>
+
+  <gazebo reference="right_wheel_link">
+    <mu1>2.0</mu1>
+    <mu2>2.0</mu2>
+    <kp>1000000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <material>
+      <ambient>0.1 0.1 0.1 1.0</ambient>
+      <diffuse>0.1 0.1 0.1 1.0</diffuse>
+      <specular>0.2 0.2 0.2 1.0</specular>
+    </material>
+  </gazebo>
+
+  <!-- ==================== IGNITION / GAZEBO PLUGINS ==================== -->
+  <gazebo reference="imu_link">
+    <sensor name="imu_sensor" type="imu">
+      <always_on>1</always_on>
+      <update_rate>100</update_rate>
+      <visualize>true</visualize>
+      <topic>imu</topic>
+    </sensor>
+  </gazebo>
+
+  <gazebo>
+    <plugin filename="ignition-gazebo-imu-system" name="ignition::gazebo::systems::Imu"/>
+    <plugin filename="ignition-gazebo-diff-drive-system" name="ignition::gazebo::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>0.160</wheel_separation>
+      <wheel_radius>0.032</wheel_radius>
+      <odom_publish_frequency>50</odom_publish_frequency>
+      <topic>/cmd_vel</topic>
+      <odom_topic>/odom</odom_topic>
+      <tf_topic>/tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+    </plugin>
+  </gazebo>
+
+</robot>
